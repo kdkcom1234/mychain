@@ -81,7 +81,7 @@
     "consensus": null,
     "crisis": {
       "constant_fee": {
-        "denom": "stake",
+        "denom": "umy",
         "amount": "1000"
       }
     },
@@ -256,7 +256,7 @@
       "params": {
         "min_deposit": [
           {
-            "denom": "stake",
+            "denom": "umy",
             "amount": "10000000"
           }
         ],
@@ -272,7 +272,7 @@
         "expedited_threshold": "0.667000000000000000",
         "expedited_min_deposit": [
           {
-            "denom": "stake",
+            "denom": "umy",
             "amount": "50000000"
           }
         ],
@@ -299,9 +299,7 @@
         "clients_consensus": [],
         "clients_metadata": [],
         "params": {
-          "allowed_clients": [
-            "*"
-          ]
+          "allowed_clients": ["*"]
         },
         "create_localhost": false,
         "next_client_sequence": "0"
@@ -349,9 +347,7 @@
         "port": "icahost",
         "params": {
           "host_enabled": true,
-          "allow_messages": [
-            "*"
-          ]
+          "allow_messages": ["*"]
         }
       }
     },
@@ -361,7 +357,7 @@
         "annual_provisions": "0.000000000000000000"
       },
       "params": {
-        "mint_denom": "stake",
+        "mint_denom": "umy",
         "inflation_rate_change": "0.130000000000000000",
         "inflation_max": "0.200000000000000000",
         "inflation_min": "0.070000000000000000",
@@ -392,7 +388,7 @@
         "max_validators": 100,
         "max_entries": 7,
         "historical_entries": 10000,
-        "bond_denom": "stake",
+        "bond_denom": "umy",
         "min_commission_rate": "0.000000000000000000"
       },
       "last_total_power": "0",
@@ -427,9 +423,7 @@
         "max_bytes": "1048576"
       },
       "validator": {
-        "pub_key_types": [
-          "ed25519"
-        ]
+        "pub_key_types": ["ed25519"]
       },
       "version": {
         "app": "0"
