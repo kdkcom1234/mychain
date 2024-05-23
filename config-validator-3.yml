@@ -53,3 +53,5 @@ validators:
         addr_book_strict: false
         seeds: 7598e56bbe95e2ad90022ba033d8d8604d3f77cf@192.168.0.209:26656
         seed_mode: false
+      statesync:
+        enable: true
