@@ -49,6 +49,6 @@ validators:
       # validator-2/3만 필요
       p2p:
         laddr: tcp://192.168.0.236:26656
+        addr_book_strict: false
         seeds: 6f343454f1bf908206fa0586fea01c256b276f40@192.168.0.209:26657
         seed_mode: true
-        addr_book_strict: false
