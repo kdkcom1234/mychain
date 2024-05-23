@@ -51,11 +51,11 @@ validators:
       p2p:
         laddr: tcp://192.168.0.236:26656
         addr_book_strict: false
-        seeds: 886c0e2e7ee96af8522a047bb6c8345b9911b0e1@192.168.0.209:26656
+        seeds: 0cc56405441664574af44b5d36cfa1811632f53b@192.168.0.209:26656
         seed_mode: false
         pex: false
       statesync:
         enable: true
         rpc_servers: "tcp://192.168.0.209:26657,tcp://221.148.71.114:26657"
         trust_height: "1"
-        trust_hash: "0B86C57AD6EEF41AA78AD5B2D273721FD5D9EB4AA5D162857D0B77FB57E449EB"
+        trust_hash: "D90C5AC09C1DC884E6ECE63A0C304E5CA471C2D46066B3DC3E0494132A6B9FB9"
