@@ -36,6 +36,8 @@ https://호스트명:26657/status
 
 ## Set Up Genesis
 
+알겠습니다. 첫 번째 노드에서 `config.toml` 파일의 RPC 설정을 외부에서 접속할 수 있도록 `0.0.0.0`으로 변경하는 작업을 추가하겠습니다.
+
 ### 전체 과정 요약
 
 #### 1. 실행 파일 생성
@@ -228,6 +230,16 @@ mychaind comet show-node-id
 #### 13. 설정 파일 편집
 각 노드의 설정 파일을 편집합니다 (`~/.mychaind/config/config.toml` 및 `~/.mychaind/config/app.toml`).
 
+##### 첫 번째 노드의 RPC 설정 변경
+첫 번째 노드에서 RPC가 외부에서 접속할 수 있도록 `config.toml` 파일을 수정합니다.
+
+**첫 번째 노드의 설정 파일 (`~/.mychaind/config/config.toml`):**
+
+```toml
+[rpc]
+laddr = "tcp://0.0.0.0:26657"
+```
+
 ##### Persistent Peers 설정
 각 노드가 서로 연결될 수 있도록 `persistent_peers`를 설정합니다.
 
@@ -274,15 +286,16 @@ mychaind start
 8. `gentx` 생성 (`mychaind genesis gentx <validator_name> 10000000umy --chain-id mychain-devnet --keyring-backend file`)
 9. `gentx` 파일 공유 (두 번째 노드에서 Git을 통해 `gentx` 파일 공유)
 10. `collect-gentxs` 실행 (`mychaind genesis collect-gentxs --keyring-backend file`)
-11. 제네시스 파일 수정 (denom 변경, `sed -i 's/"stake"/"umy"/g' ~/.mychaind/config/genesis.json`)
+11. 제네시스 파일 수정 (denom 변경, `sed -i 's
+
+/"stake"/"umy"/g' ~/.mychaind/config/genesis.json`)
 12. 최신 제네시스 파일 공유 (Git을 통해 `genesis.json` 파일 공유)
 13. 각 노드의 Node ID 확인 (`mychaind comet show-node-id`)
 14. 설정 파일 편집 (`persistent_peers` 및 `minimum-gas-prices` 설정)
+    - 첫 번째 노드의 RPC 설정 변경 (`laddr = "tcp://0.0.0.0:26657"`)
 15. 노드 실행 (`mychaind start`)
 16. 테스트 및 모니터링
 
-이 과정을 통해 각
-
- 노드의 설정을 완료하고, 노드들이 서로 연결되며, 네트워크가 정상적으로 동작하도록 설정할 수 있습니다.
+이 과정을 통해 각 노드의 설정을 완료하고, 노드들이 서로 연결되며, 네트워크가 정상적으로 동작하도록 설정할 수 있습니다.
 
 --
