@@ -55,3 +55,4 @@ validators:
         seed_mode: false
       statesync:
         enable: true
+        rpc_servers: "tcp://192.168.0.209:26657,tcp://221.148.71.114:26657"
