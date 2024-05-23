@@ -1,0 +1,52 @@
+validation: sovereign
+version: 1
+accounts:
+  - name: validator-1
+    coins:
+      - 20000000umy
+    mnemonic: advice farm scrap basket knock wish tattoo order dog arrange obey metal day romance drift busy short chronic impulse keen kiwi lawn answer short
+  - name: validator-2
+    coins:
+      - 20000000umy
+    mnemonic: clean kit shoe brief teach settle stuff enlist build walk fly battle staff scare usage cry company decorate train cute list card sun salad
+  - name: validator-3
+    coins:
+      - 20000000umy
+    mnemonic: already guilt lawsuit crime silent practice orchard garment electric month during goddess celery advice slim term please survey stool flight wash provide thunder planet
+faucet:
+  name: validator-1
+  coins:
+    - 1000000umy
+  coins_max:
+    - 1umy
+genesis:
+  chain_id: mychain-devnet
+  app_state:
+    mint:
+      params:
+        mint_denom: umy
+    staking:
+      params:
+        bond_denom: umy
+    gov:
+      params:
+        expedited_min_deposit:
+          - amount: "20000000"
+            denom: umy
+        min_deposit:
+          - amount: "10000000"
+            denom: umy
+    crisis:
+      constant_fee:
+        amount: "10000000"
+        denom: umy
+
+validators:
+  - name: validator-2
+    bonded: 10000000umy
+    config:
+      moniker: mychain-devnet-validator-2
+      # validator-2/3만 필요
+      p2p:
+        seeds:
+        persistent_peeers:
