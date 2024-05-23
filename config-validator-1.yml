@@ -51,3 +51,6 @@ validators:
         laddr: tcp://192.168.0.209:26656
         addr_book_strict: false
         seed_mode: false
+      snapshot:
+        snapshot_interval: "1000"
+        snapshot_keep_recent: "10"
