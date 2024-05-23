@@ -48,6 +48,6 @@ validators:
       moniker: mychain-devnet-validator-3
       # validator-2/3만 필요
       p2p:
+        laddr: tcp://192.168.0.237:26656
         seeds: bd32873538a4361d5c509ccddbca80087b04415a@192.168.0.209:26657
-        persistent_peers: bd32873538a4361d5c509ccddbca80087b04415a@192.168.0.209:26657
         seed_mode: true
