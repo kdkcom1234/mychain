@@ -46,3 +46,5 @@ validators:
     bonded: 10000000umy
     config:
       moniker: mychain-devnet-validator-1
+      p2p:
+        laddr: tcp://192.168.0.209:26656
