@@ -56,5 +56,5 @@ validators:
       statesync:
         enable: true
         rpc_servers: "tcp://192.168.0.209:26657,tcp://221.148.71.114:26657"
-        trust_height: 1
+        trust_height: "1"
         trust_hash: "459449C6507B871961526CD525A8A092BA4F97DBA8DC2975CF69550DBAB62455"
