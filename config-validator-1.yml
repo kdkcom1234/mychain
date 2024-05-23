@@ -45,6 +45,10 @@ genesis:
 validators:
   - name: validator-1
     bonded: 10000000umy
+    app:
+      state-sync:
+        snapshot-interval: "10"
+        snapshot-keep-recent: "1000"
     config:
       moniker: mychain-devnet-validator-1
       p2p:
@@ -52,6 +56,3 @@ validators:
         addr_book_strict: false
         seed_mode: false
         pex: false
-      snapshot:
-        snapshot_interval: "10"
-        snapshot_keep_recent: "1000"
