@@ -23,9 +23,7 @@ curl https://get.ignite.com/cli! | bash
 ## Serve Development Mode
 
 ```shell
-ignite chain serve -v --config ./config-validator-1.yml
-ignite chain serve -v --config ./config-validator-2.yml
-ignite chain serve -v --config ./config-validator-3.yml
+ignite chain serve -v
 ```
 
 ## Host Status
@@ -33,3 +31,247 @@ ignite chain serve -v --config ./config-validator-3.yml
 ```shell
 https://호스트명:26657/status
 ```
+
+--
+
+## Set Up Devnet Genesis
+
+### 전체 과정 요약
+
+#### 1. 실행 파일 생성
+
+먼저, `ignite`를 사용하여 실행 파일을 만듭니다.
+
+```sh
+ignite chain build
+```
+
+#### 2. 노드 초기화 및 계정 생성
+
+각 노드에서 초기화하고 키를 생성합니다.
+
+**첫 번째 노드:**
+
+```sh
+mychaind init validator-1 --chain-id mychain-devnet
+mychaind keys add validator-1 --keyring-backend file
+```
+
+**두 번째 노드:**
+
+```sh
+mychaind init validator-2 --chain-id mychain-devnet
+mychaind keys add validator-2 --keyring-backend file
+```
+
+#### 3. 키 주소 추출
+
+각 노드에서 생성된 키의 주소를 추출합니다.
+
+**첫 번째 노드:**
+
+```sh
+mychaind keys show validator-1 -a --keyring-backend file
+```
+
+**두 번째 노드:**
+
+```sh
+mychaind keys show validator-2 -a --keyring-backend file
+```
+
+각 노드의 주소를 기록해 둡니다. 예를 들어:
+
+- validator-1: my1...
+- validator-2: my1...
+
+#### 4. 제네시스 파일 수정
+
+첫 번째 노드에서 제네시스 파일을 수정하여 두 노드의 초기 잔액을 할당합니다.
+
+**첫 번째 노드:**
+
+```sh
+mychaind genesis add-genesis-account validator-1 20000000umy --keyring-backend file
+mychaind genesis add-genesis-account <validator-2_address> 20000000umy --keyring-backend file
+```
+
+여기서 `<validator-2_address>`는 두 번째 노드에서 추출한 주소입니다.
+
+#### 5. 수정된 제네시스 파일 공유
+
+수정된 제네시스 파일을 Git을 통해 두 번째 노드로 공유합니다.
+
+**첫 번째 노드:**
+
+1. `genesis.json` 파일을 Git 리포지토리에 추가하고 커밋합니다.
+
+```sh
+cd <your-git-repo-root>
+cp ~/.mychaind/config/genesis.json ./genesis.json
+git add genesis.json
+git commit -m "Add modified genesis.json"
+git push origin main
+```
+
+2. 두 번째 노드에서 Git 리포지토리에서 변경 사항을 풀합니다.
+
+```sh
+cd <your-git-repo-root>
+git pull origin main
+cp ./genesis.json ~/.mychaind/config/genesis.json
+```
+
+#### 6. 제네시스 파일 확인
+
+두 번째 노드에서 제네시스 파일이 제대로 수정되었는지 확인합니다.
+
+**두 번째 노드:**
+
+```sh
+cat ~/.mychaind/config/genesis.json
+```
+
+`genesis.json` 파일에서 `accounts` 섹션을 확인하여 두 계정이 올바르게 추가되었는지 확인합니다.
+
+#### 7. `gentx` 생성
+
+각 노드에서 `gentx`를 생성합니다.
+
+**첫 번째 노드:**
+
+```sh
+mychaind genesis gentx validator-1 10000000umy --chain-id mychain-devnet --keyring-backend file
+```
+
+**두 번째 노드:**
+
+```sh
+mychaind genesis gentx validator-2 10000000umy --chain-id mychain-devnet --keyring-backend file
+```
+
+#### 8. `gentx` 파일 공유
+
+생성된 `gentx` 파일을 Git을 통해 첫 번째 노드로 공유합니다.
+
+**두 번째 노드:**
+
+1. `gentx` 파일을 Git 리포지토리에 추가하고 커밋합니다.
+
+```sh
+cd <your-git-repo-root>
+cp ~/.mychaind/config/gentx/gentx-*.json ./gentx-2.json
+git add gentx-2.json
+git commit -m "Add gentx for validator-2"
+git push origin main
+```
+
+2. 첫 번째 노드에서 Git 리포지토리에서 변경 사항을 풀합니다.
+
+```sh
+cd <your-git-repo-root>
+git pull origin main
+cp ./gentx-2.json ~/.mychaind/config/gentx/
+```
+
+#### 9. `collect-gentxs` 실행
+
+첫 번째 노드에서 `gentx` 파일을 모아서 `collect-gentxs`를 실행합니다.
+
+**첫 번째 노드:**
+
+```sh
+mychaind collect-gentxs --keyring-backend file
+```
+
+이 명령어는 `gentx` 파일을 모아서 제네시스 파일을 업데이트합니다.
+
+#### 10. Node ID 확인
+
+각 노드의 Node ID를 확인합니다.
+
+**첫 번째 노드:**
+
+```sh
+mychaind tendermint show-node-id
+```
+
+**두 번째 노드:**
+
+```sh
+mychaind tendermint show-node-id
+```
+
+이 명령어는 각 노드의 Node ID를 출력합니다. 예를 들어:
+
+- 첫 번째 노드의 Node ID: `node1_id`
+- 두 번째 노드의 Node ID: `node2_id`
+
+#### 11. 설정 파일 편집
+
+각 노드의 설정 파일을 편집합니다 (`~/.mychaind/config/config.toml` 및 `~/.mychaind/config/app.toml`).
+
+##### Persistent Peers 설정
+
+각 노드가 서로 연결될 수 있도록 `persistent_peers`를 설정합니다.
+
+**첫 번째 노드의 설정 파일 (`~/.mychaind/config/config.toml`):**
+
+```toml
+persistent_peers = "<node2_id>@<second_node_ip>:26656"
+```
+
+**두 번째 노드의 설정 파일 (`~/.mychaind/config/config.toml`):**
+
+```toml
+persistent_peers = "<node1_id>@<first_node_ip>:26656"
+```
+
+##### 최소 가스 가격 설정
+
+`app.toml` 파일에서 최소 가스 가격을 설정합니다.
+
+**첫 번째 노드의 `app.toml` 파일 (`~/.mychaind/config/app.toml`):**
+
+```toml
+minimum-gas-prices = "1umy"
+```
+
+**두 번째 노드의 `app.toml` 파일 (`~/.mychaind/config/app.toml`):**
+
+```toml
+minimum-gas-prices = "1umy"
+```
+
+#### 12. 노드 실행
+
+모든 노드에서 다음 명령어를 실행하여 노드를 시작합니다.
+
+```sh
+mychaind start
+```
+
+#### 13. 테스트 및 모니터링
+
+네트워크가 정상적으로 동작하는지 확인합니다. 블록이 정상적으로 생성되고 있는지, 트랜잭션이 정상적으로 처리되는지 모니터링합니다.
+
+### 전체 과정 요약
+
+1. 실행 파일 생성 (`ignite chain build`)
+2. 노드 초기화 (`mychaind init <moniker> --chain-id mychain-devnet`)
+3. 키 추가 (`mychaind keys add <validator_name> --keyring-backend file`)
+4. 각 노드의 키 주소 추출 (`mychaind keys show <validator_name> -a --keyring-backend file`)
+5. 제네시스 파일 수정 (`mychaind genesis add-genesis-account <validator_address> 20000000umy --keyring-backend file`)
+6. 수정된 제네시스 파일 공유 (Git을 통해 `genesis.json` 공유)
+7. 제네시스 파일 확인 (`cat ~/.mychaind/config/genesis.json`)
+8. `gentx` 생성 (`mychaind genesis gentx <validator_name> 10000000umy --chain-id mychain-devnet --keyring-backend file`)
+9. `gentx` 파일 공유 (Git을 통해 `gentx` 파일 공유)
+10. `collect-gentxs` 실행 (`mychaind collect-gentxs --keyring-backend file`)
+11. 각 노드의 Node ID 확인 (`mychaind tendermint show-node-id`)
+12. 설정 파일 편집 (`persistent_peers` 및 `minimum-gas-prices` 설정)
+13. 노드 실행 (`mychaind start`)
+14. 테스트 및 모니터링
+
+이 과정을 통해 각 노드의 설정을 완료하고, 노드들이 서로 연결되며, 네트워크가 정상적으로 동작하도록 설정할 수 있습니다.
+
+--
