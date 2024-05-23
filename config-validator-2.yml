@@ -21,6 +21,7 @@ faucet:
     - 1umy
 genesis:
   chain_id: mychain-devnet
+  genesis_time: "2024-05-23T02:56:42.736309Z"
   app_state:
     mint:
       params:
