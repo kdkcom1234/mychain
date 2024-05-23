@@ -53,6 +53,7 @@ validators:
         addr_book_strict: false
         seeds: 886c0e2e7ee96af8522a047bb6c8345b9911b0e1@192.168.0.209:26656
         seed_mode: false
+        pex: false
       statesync:
         enable: true
         rpc_servers: "tcp://192.168.0.209:26657,tcp://221.148.71.114:26657"
