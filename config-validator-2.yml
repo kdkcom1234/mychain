@@ -48,5 +48,5 @@ validators:
       moniker: mychain-devnet-validator-2
       # validator-2/3만 필요
       p2p:
-        seeds:
-        persistent_peeers:
+        seeds: bd32873538a4361d5c509ccddbca80087b04415a@192.168.0.209:26657
+        persistent_peeers: bd32873538a4361d5c509ccddbca80087b04415a@192.168.0.209:26657
