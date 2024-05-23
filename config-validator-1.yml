@@ -55,6 +55,6 @@ validators:
         laddr: tcp://192.168.0.209:26656
         addr_book_strict: false
         seed_mode: false
-        pex: false
+        # pex: false
       rpc:
         laddr: tcp://192.168.0.209:26657

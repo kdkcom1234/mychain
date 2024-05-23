@@ -53,9 +53,9 @@ validators:
         addr_book_strict: false
         seeds: 6b3885aacbd10209ac04b2f687afb469747251b3@192.168.0.209:26656
         seed_mode: false
-        pex: false
-      statesync:
-        enable: true
-        rpc_servers: "tcp://192.168.0.209:26657,tcp://221.148.71.114:26657"
-        trust_height: "1"
-        trust_hash: "1258D4A83B694B49249356B00CE6F26B13C8CE6C323FB7877C13BA305A45F863"
+      #   pex: false
+      # statesync:
+      #   enable: true
+      #   rpc_servers: "tcp://192.168.0.209:26657,tcp://221.148.71.114:26657"
+      #   trust_height: "1"
+      #   trust_hash: "1258D4A83B694B49249356B00CE6F26B13C8CE6C323FB7877C13BA305A45F863"
