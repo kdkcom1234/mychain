@@ -52,5 +52,5 @@ validators:
         addr_book_strict: false
         seed_mode: false
       snapshot:
-        snapshot_interval: "1000"
-        snapshot_keep_recent: "10"
+        snapshot_interval: "10"
+        snapshot_keep_recent: "1000"
