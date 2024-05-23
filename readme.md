@@ -286,9 +286,7 @@ mychaind start
 8. `gentx` 생성 (`mychaind genesis gentx <validator_name> 10000000umy --chain-id mychain-devnet --keyring-backend file`)
 9. `gentx` 파일 공유 (두 번째 노드에서 Git을 통해 `gentx` 파일 공유)
 10. `collect-gentxs` 실행 (`mychaind genesis collect-gentxs --keyring-backend file`)
-11. 제네시스 파일 수정 (denom 변경, `sed -i 's
-
-/"stake"/"umy"/g' ~/.mychaind/config/genesis.json`)
+11. 제네시스 파일 수정 (denom 변경, `sed -i 's/"stake"/"umy"/g' ~/.mychaind/config/genesis.json`)
 12. 최신 제네시스 파일 공유 (Git을 통해 `genesis.json` 파일 공유)
 13. 각 노드의 Node ID 확인 (`mychaind comet show-node-id`)
 14. 설정 파일 편집 (`persistent_peers` 및 `minimum-gas-prices` 설정)
