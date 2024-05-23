@@ -21,7 +21,6 @@ faucet:
     - 1umy
 genesis:
   chain_id: mychain-devnet
-  genesis_time: "2024-05-23T02:56:42.736309Z"
   app_state:
     mint:
       params:
@@ -47,6 +46,3 @@ validators:
     bonded: 10000000umy
     config:
       moniker: mychain-devnet-validator-1
-      p2p:
-        addr_book_strict: false
-        seed_mode: false
