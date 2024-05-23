@@ -51,3 +51,4 @@ validators:
         laddr: tcp://192.168.0.237:26656
         addr_book_strict: false
         seeds: 2b21ee9035b627d7a712c4988b17893f3e7a53df@192.168.0.209:26656
+        seed_mode: false
