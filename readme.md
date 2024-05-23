@@ -36,8 +36,6 @@ https://호스트명:26657/status
 
 ## Set Up Genesis
 
-알겠습니다. `collect-gentxs` 명령과 Node ID 확인 명령을 정확히 수정하여 업데이트된 문서를 제공하겠습니다.
-
 ### 전체 과정 요약
 
 #### 1. 실행 파일 생성
