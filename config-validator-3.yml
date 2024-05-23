@@ -51,7 +51,7 @@ validators:
       p2p:
         laddr: tcp://192.168.0.237:26656
         addr_book_strict: false
-        seeds: 466d54f005a98779d93c7ca1c5ab0f55c357291d@192.168.0.209:26656
+        seeds: b4c9b1c18239bfe398734dec106600f0bfcfc53c@192.168.0.209:26656
         seed_mode: false
       #   pex: false
       # statesync:
