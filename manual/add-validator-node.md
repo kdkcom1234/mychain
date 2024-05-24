@@ -165,28 +165,25 @@ curl http://localhost:26657/status
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant Node
-    participant Existing Node
-    participant Exchange
-    participant RPC Node
+    participant 노드
+    participant 기존_노드
+    participant RPC_노드
 
-    User->>Node: git clone <repository_url>
-    User->>Node: cd <repository_directory>
-    User->>Node: ignite chain build
-    User->>Node: mychaind init validator-3 --chain-id mychain-devnet
-    User->>Node: mychaind keys add validator-3 --keyring-backend file
-    User->>Node: mychaind keys show validator-3 --keyring-backend file -a
-    User->>Exchange: Purchase 5000000umy
-    Exchange->>Node: Transfer 5000000umy to validator-3 address
-    User->>Existing Node: mychaind tx bank send validator-1 <validator-3_address> 5000000umy --chain-id mychain-devnet --keyring-backend file --fees 200000umy
-    User->>Node: mychaind comet show-validator
-    Note right of User: Create staking.json file with pubkey
-    User->>RPC Node: mychaind tx staking create-validator ./staking.json --from=validator-3 --keyring-backend=file --chain-id=mychain-devnet --node tcp://<your.other.nodes.ipaddress>:26657 --fees 200000umy
-    User->>Node: Update app.toml and config.toml
-    User->>Node: mychaind comet unsafe-reset-all
-    User->>Node: mychaind start
-    User->>Node: curl http://localhost:26657/status
+    노드->>노드: 소스코드 클론
+    노드->>노드: 디렉토리 이동
+    노드->>노드: 체인 빌드
+    노드->>노드: 노드 초기화
+    노드->>노드: 키 추가
+    노드->>노드: 계정 주소 조회
+    기존_노드->>노드: 5000000umy 전송
+    노드->>노드: 검증자 공개키 조회
+    Note right of 노드: staking.json 파일 생성
+    노드->>RPC_노드: 스테이킹 트랜잭션 생성 및 전송
+    노드->>노드: 설정 파일 수정
+    노드->>노드: 노드 상태 초기화
+    노드->>노드: 노드 시작
+    노드->>노드: 동기화 상태 확인
+
 ```
 
 이 다이어그램은 전체 프로세스를 시각적으로 표현하여 이해하기 쉽게 만듭니다. 이를 통해 노드 설정 및 트랜잭션 생성 절차를 더 쉽게 따라갈 수 있습니다.
