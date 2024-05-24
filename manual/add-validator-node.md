@@ -1,6 +1,32 @@
-물론입니다. 아래에 Mermaid 시퀀스 다이어그램을 추가하여 전체 과정을 시각화하겠습니다.
+# 새로운 밸리데이터를 추가하는 방법
 
-### 새로운 밸리데이터 노드 추가 절차 (스테이킹 포함)
+## Install Go
+
+```shell
+wget go1.22.3.linux-amd64.tar.gz
+tar -C /usr/local -xzf go1.22.3.linux-amd64.tar.gz
+```
+
+```shell
+vi .profile
+```
+
+```
+PATH=$PATH:/usr/local/go/bin
+PATH=$PATH:$HOME/go/bin
+```
+
+## Install Ignite
+
+```shell
+curl https://get.ignite.com/cli! | bash
+```
+
+--
+
+## Set Up a Validator
+
+### 전체 과정 요약
 
 #### 1. 소스코드 다운로드 및 빌드
 

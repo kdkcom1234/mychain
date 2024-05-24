@@ -1,4 +1,4 @@
-# Genesis Stage Coordinator Node and Validator Node's Tasks
+# 제네시스 단계의 작업
 
 ## Install Go
 
