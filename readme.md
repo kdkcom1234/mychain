@@ -36,8 +36,6 @@ https://호스트명:26657/status
 
 ## Set Up Genesis
 
-알겠습니다. 각 노드의 Node ID, IP 주소 및 포트를 공유할 수 있도록 수정하겠습니다.
-
 ### 전체 과정 요약
 
 #### 0. 소스 코드 받기
@@ -374,9 +372,6 @@ mychaind start
     - Coordinator Node의 RPC 설정 변경 (`laddr = "tcp://0.0.0.0:26657"`)
 14. 노드 실행 (`mychaind start`)
 15. 테스트 및 모니터링
-
-이 과정을 통해 각 노드의 설정을 완료하고, 노드들이 서로 연결되며, 네트워크가 정상적으로 동작하도록 설정할 수 있습니다.
-Mermaid를 이용한 시퀀스 다이어그램은 다음과 같습니다. 이 다이어그램은 각 노드 간의 상호작용을 시각적으로 나타냅니다.
 
 ```mermaid
 sequenceDiagram
