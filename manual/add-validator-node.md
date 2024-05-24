@@ -28,6 +28,46 @@ curl https://get.ignite.com/cli! | bash
 
 ### 전체 과정 요약
 
+1. 소스코드 다운로드 및 빌드 (`git clone <repository_url>` -> `cd <repository_directory>` -> `ignite chain build`)
+2. 노드 초기화 및 `genesis.json` 적용 (`mychaind init validator-3 --chain-id mychain-devnet` -> `curl -O <genesis_file_url> -o ~/.mychaind/config/genesis.json`)
+3. 키 추가 및 계정 주소 조회 (`mychaind keys add validator-3 --keyring-backend file` -> `mychaind keys show validator-3 --keyring-backend file -a`)
+4. 코인 구매 및 계정에 전송 (코인을 구매하여 전송하거나 기존 밸리데이터 노드에서 전송, `--fees 200000umy` 추가)
+5. 스테이킹 트랜잭션 생성 및 전송
+   - `mychaind comet show-validator`를 사용하여 `pubkey` 값을 조회
+   - `staking.json` 파일 생성
+   - `mychaind tx staking create-validator ./staking.json --from=validator-3 --keyring-backend=file --chain-id=mychain-devnet --node tcp://<your.other.nodes.ipaddress>:26657 --fees 200000umy`
+6. 설정 파일 수정 (`app.toml` 및 `config.toml` 수정)
+7. 노드 상태 초기화 (`mychaind comet unsafe-reset-all`)
+8. 노드 실행 및 동기화 (`mychaind start`)
+9. 동기화 상태 확인 (REST API 사용)
+10. 노드 실행 및 모니터링 (`mychaind start`)
+
+```mermaid
+sequenceDiagram
+    participant 노드
+    participant 소스코드_저장소
+    participant genesis_저장소
+    participant 기존_노드
+    participant RPC_노드
+
+    노드->>소스코드_저장소: 소스코드 클론
+    노드->>노드: 디렉토리 이동
+    노드->>노드: 체인 빌드
+    노드->>노드: 노드 초기화
+    노드->>genesis_저장소: genesis.json 받기
+    노드->>노드: genesis.json 적용
+    노드->>노드: 키 추가
+    노드->>노드: 계정 주소 조회
+    기존_노드->>노드: 5000000umy 전송
+    노드->>노드: 검증자 공개키 조회
+    Note right of 노드: staking.json 파일 생성
+    노드->>RPC_노드: 스테이킹 트랜잭션 생성 및 전송
+    노드->>노드: 설정 파일 수정
+    노드->>노드: 노드 상태 초기화
+    노드->>노드: 노드 시작
+    노드->>노드: 동기화 상태 확인
+```
+
 #### 1. 소스코드 다운로드 및 빌드
 
 새로운 노드에서 소스코드를 다운로드하고 빌드합니다.
@@ -38,26 +78,27 @@ cd <repository_directory>
 ignite chain build
 ```
 
-#### 2. 노드 초기화 및 계정 생성
+#### 2. 노드 초기화 및 `genesis.json` 적용
 
-새로운 노드에서 초기화하고 키를 생성합니다.
+새로운 노드에서 초기화하고 `genesis.json` 파일을 받아 적용합니다.
 
 ```sh
 mychaind init validator-3 --chain-id mychain-devnet
-mychaind keys add validator-3 --keyring-backend file
+curl -O <genesis_file_url> -o ~/.mychaind/config/genesis.json
 ```
 
-#### 3. 계정 주소 조회
+#### 3. 키 추가 및 계정 주소 조회
 
-생성한 계정의 주소를 조회합니다.
+키를 추가하고 생성한 계정의 주소를 조회합니다.
 
 ```sh
+mychaind keys add validator-3 --keyring-backend file
 mychaind keys show validator-3 --keyring-backend file -a
 ```
 
 #### 4. 코인 구매 및 계정에 전송
 
-새로운 노드의 계정(validator-3)으로 거래소에서 코인을 구매하여 전송합니다. 또는 기존 밸리데이터 노드에서 새로운 노드의 계정으로 코인을 전송할 수 있습니다.
+코인을 구매하여 전송하거나 기존 밸리데이터 노드에서 새로운 노드의 계정으로 코인을 전송합니다.
 
 ```sh
 mychaind tx bank send validator-1 <validator-3_address> 5000000umy --chain-id mychain-devnet --keyring-backend file --fees 200000umy
@@ -144,46 +185,3 @@ curl http://localhost:26657/status
 #### 10. 노드 실행 및 모니터링
 
 노드가 네트워크에 정상적으로 참여하고 있는지 확인합니다. 블록이 정상적으로 생성되고 있는지, 트랜잭션이 정상적으로 처리되는지 모니터링합니다.
-
-### 전체 과정 요약
-
-1. 소스코드 다운로드 및 빌드 (`git clone <repository_url>` -> `cd <repository_directory>` -> `ignite chain build`)
-2. 노드 초기화 (`mychaind init validator-3 --chain-id mychain-devnet`)
-3. 계정 주소 조회 (`mychaind keys show validator-3 --keyring-backend file -a`)
-4. 코인 구매 및 계정에 전송 (거래소에서 코인 구매 또는 기존 밸리데이터 노드에서 전송, `--fees 200000umy` 추가)
-5. 스테이킹 트랜잭션 생성 및 전송
-   - `mychaind comet show-validator`를 사용하여 `pubkey` 값을 조회
-   - `staking.json` 파일 생성
-   - `mychaind tx staking create-validator ./staking.json --from=validator-3 --keyring-backend=file --chain-id=mychain-devnet --node tcp://<your.other.nodes.ipaddress>:26657 --fees 200000umy`
-6. 설정 파일 수정 (`app.toml` 및 `config.toml` 수정)
-7. 노드 상태 초기화 (`mychaind comet unsafe-reset-all`)
-8. 노드 실행 및 동기화 (`mychaind start`)
-9. 동기화 상태 확인 (REST API 사용)
-10. 노드 실행 및 모니터링 (`mychaind start`)
-
-### Mermaid 시퀀스 다이어그램
-
-```mermaid
-sequenceDiagram
-    participant 노드
-    participant 기존_노드
-    participant RPC_노드
-
-    노드->>노드: 소스코드 클론
-    노드->>노드: 디렉토리 이동
-    노드->>노드: 체인 빌드
-    노드->>노드: 노드 초기화
-    노드->>노드: 키 추가
-    노드->>노드: 계정 주소 조회
-    기존_노드->>노드: 5000000umy 전송
-    노드->>노드: 검증자 공개키 조회
-    Note right of 노드: staking.json 파일 생성
-    노드->>RPC_노드: 스테이킹 트랜잭션 생성 및 전송
-    노드->>노드: 설정 파일 수정
-    노드->>노드: 노드 상태 초기화
-    노드->>노드: 노드 시작
-    노드->>노드: 동기화 상태 확인
-
-```
-
-이 다이어그램은 전체 프로세스를 시각적으로 표현하여 이해하기 쉽게 만듭니다. 이를 통해 노드 설정 및 트랜잭션 생성 절차를 더 쉽게 따라갈 수 있습니다.

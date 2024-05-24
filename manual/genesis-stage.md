@@ -28,7 +28,79 @@ curl https://get.ignite.com/cli! | bash
 
 ### 전체 과정 요약
 
-#### 0. 소스 코드 받기
+1. 소스 코드 받기 (`git clone <source-code-repo-url>`)
+2. 실행 파일 생성 (`ignite chain build`)
+3. 노드 초기화 (`mychaind init <moniker> --chain-id mychain-devnet`)
+4. 키 추가 (`mychaind keys add <validator_name> --keyring-backend file`)
+5. 각 노드의 키 주소 추출 및 공유
+   - Validator Node에서 키 주소를 제네시스 저장소를 통해 Coordinator Node에게 전달
+6. 제네시스 파일 수정 (`mychaind genesis add-genesis-account <validator_address> 20000000umy --keyring-backend file`)
+7. 수정된 제네시스 파일 공유 (제네시스 저장소를 통해 `genesis.json` 공유)
+8. 제네시스 파일 확인 (`cat ~/.mychaind/config/genesis.json`)
+9. `gentx` 생성 (`mychaind genesis gentx <validator_name> 10000000umy --chain-id mychain-devnet --keyring-backend file`)
+10. `gentx` 파일 공유 (Validator Node에서 제네시스 저장소를 통해 `gentx` 파일 공유)
+11. `collect-gentxs` 실행 (`mychaind genesis collect-gentxs --keyring-backend file`)
+12. 제네시스 파일 수정 (denom 변경, `sed -i 's/"stake"/"umy"/g' ~/.mychaind/config/genesis.json`)
+13. Node ID 및 Peer 정보 확인 및 공유 (제네시스 저장소를 통해 Node ID와 Peer 정보 공유)
+14. 설정 파일 편집 (`persistent_peers` 및 `minimum-gas-prices` 설정)
+    - Coordinator Node의 RPC 설정 변경 (`laddr = "tcp://0.0.0.0:26657"`)
+15. 노드 실행 (`mychaind start`)
+16. 테스트 및 모니터링
+
+```mermaid
+sequenceDiagram
+    participant SourceRepo as Source Code Repo
+    participant GenesisRepo as Genesis Data Repo
+    participant CoordNode as Coordinator Node
+    participant ValidNode as Validator Node
+
+    SourceRepo-->>CoordNode: 1. 소스 코드 받기
+    SourceRepo-->>ValidNode: 1. 소스 코드 받기
+
+    CoordNode->>CoordNode: 2. 실행 파일 생성
+    ValidNode->>ValidNode: 2. 실행 파일 생성
+
+    CoordNode->>CoordNode: 3. 노드 초기화 및 계정 생성
+    ValidNode->>ValidNode: 3. 노드 초기화 및 계정 생성
+
+    CoordNode->>CoordNode: 4. 키 주소 추출
+    ValidNode->>ValidNode: 4. 키 주소 추출
+    ValidNode->>GenesisRepo: 4. 키 주소 공유
+    GenesisRepo-->>CoordNode: 4. 키 주소 전달
+
+    CoordNode->>CoordNode: 5. 제네시스 파일 수정
+    CoordNode->>GenesisRepo: 6. 수정된 제네시스 파일 공유
+    GenesisRepo-->>ValidNode: 6. 수정된 제네시스 파일 전달
+
+    ValidNode->>ValidNode: 7. 제네시스 파일 확인
+
+    CoordNode->>CoordNode: 8. gentx 생성
+    ValidNode->>ValidNode: 8. gentx 생성
+    ValidNode->>GenesisRepo: 9. gentx 파일 공유
+    GenesisRepo-->>CoordNode: 9. gentx 파일 전달
+
+    CoordNode->>CoordNode: 10. collect-gentxs 실행
+
+    CoordNode->>CoordNode: 11. 제네시스 파일 수정 (denom 변경)
+    CoordNode->>GenesisRepo: 12. 최신 제네시스 파일 공유
+    GenesisRepo-->>ValidNode: 12. 최신 제네시스 파일 전달
+
+    CoordNode->>CoordNode: 13. Node ID 확인 및 공유
+    ValidNode->>ValidNode: 13. Node ID 확인 및 공유
+    ValidNode->>GenesisRepo: 13. Node ID 및 Peer 정보 공유
+    GenesisRepo-->>CoordNode: 13. Node ID 및 Peer 정보 전달
+
+    CoordNode->>CoordNode: 14. 설정 파일 편집
+    ValidNode->>ValidNode: 14. 설정 파일 편집
+
+    CoordNode->>CoordNode: 15. 노드 실행
+    ValidNode->>ValidNode: 15. 노드 실행
+
+    CoordNode->>CoordNode: 16. 테스트 및 모니터링
+    ValidNode->>ValidNode: 16. 테스트 및 모니터링
+```
+
+#### 1. 소스 코드 받기
 
 먼저, 소스 코드가 있는 Git 저장소에서 코드를 클론합니다.
 
@@ -37,7 +109,7 @@ git clone <source-code-repo-url>
 cd <source-code-repo-directory>
 ```
 
-#### 1. 실행 파일 생성
+#### 2. 실행 파일 생성
 
 `ignite`를 사용하여 실행 파일을 만듭니다.
 
@@ -45,7 +117,7 @@ cd <source-code-repo-directory>
 ignite chain build
 ```
 
-#### 2. 노드 초기화 및 계정 생성
+#### 3. 노드 초기화 및 계정 생성
 
 각 노드에서 초기화하고 키를 생성합니다.
 
@@ -63,7 +135,7 @@ mychaind init validator-node --chain-id mychain-devnet
 mychaind keys add validator-node --keyring-backend file
 ```
 
-#### 3. 키 주소 추출 및 공유
+#### 4. 키 주소 추출 및 공유
 
 각 노드에서 생성된 키의 주소를 추출합니다.
 
@@ -108,7 +180,7 @@ git pull origin main
 validator_node_address=$(cat validator-node-address.txt)
 ```
 
-#### 4. 제네시스 파일 수정
+#### 5. 제네시스 파일 수정
 
 Coordinator Node에서 제네시스 파일을 수정하여 두 노드의 초기 잔액을 할당합니다.
 
@@ -119,7 +191,7 @@ mychaind genesis add-genesis-account coordinator-node 20000000umy --keyring-back
 mychaind genesis add-genesis-account $validator_node_address 20000000umy --keyring-backend file
 ```
 
-#### 5. 수정된 제네시스 파일 공유
+#### 6. 수정된 제네시스 파일 공유
 
 수정된 제네시스 파일을 제네시스 저장소를 통해 공유합니다.
 
@@ -145,7 +217,7 @@ git pull origin main
 cp ./genesis.json ~/.mychaind/config/genesis.json
 ```
 
-#### 6. 제네시스 파일 확인
+#### 7. 제네시스 파일 확인
 
 Validator Node에서 제네시스 파일이 제대로 수정되었는지 확인합니다.
 
@@ -157,7 +229,7 @@ cat ~/.mychaind/config/genesis.json
 
 `genesis.json` 파일에서 `accounts` 섹션을 확인하여 두 계정이 올바르게 추가되었는지 확인합니다.
 
-#### 7. `gentx` 생성
+#### 8. `gentx` 생성
 
 각 노드에서 `gentx`를 생성합니다.
 
@@ -173,7 +245,7 @@ mychaind genesis gentx coordinator-node 10000000umy --chain-id mychain-devnet --
 mychaind genesis gentx validator-node 10000000umy --chain-id mychain-devnet --keyring-backend file
 ```
 
-#### 8. `gentx` 파일 공유
+#### 9. `gentx` 파일 공유
 
 Validator Node에서 생성된 `gentx` 파일을 제네시스 저장소를 통해 공유합니다.
 
@@ -197,7 +269,7 @@ git pull origin main
 cp ./gentx-validator-node.json ~/.mychaind/config/gentx/
 ```
 
-#### 9. `collect-gentxs` 실행
+#### 10. `collect-gentxs` 실행
 
 Coordinator Node에서 `gentx` 파일을 모아서 `collect-gentxs`를 실행합니다.
 
@@ -209,7 +281,7 @@ mychaind genesis collect-gentxs --keyring-backend file
 
 이 명령어는 `gentx` 파일을 모아서 제네시스 파일을 업데이트합니다.
 
-#### 10. 제네시스 파일 수정 (denom 변경)
+#### 11. 제네시스 파일 수정 (denom 변경)
 
 `collect-gentxs` 후에 `genesis.json` 파일에서 모든 `stake` denom을 `umy`로 변경합니다.
 
@@ -219,7 +291,7 @@ mychaind genesis collect-gentxs --keyring-backend file
 sed -i 's/"stake"/"umy"/g' ~/.mychaind/config/genesis.json
 ```
 
-#### 11. 최신 제네시스 파일 공유
+#### 12. 최신 제네시스 파일 공유
 
 업데이트된 제네시스 파일을 제네시스 저장소를 통해 모든 노드에 공유합니다.
 
@@ -245,7 +317,7 @@ git pull origin main
 cp ./genesis.json ~/.mychaind/config/genesis.json
 ```
 
-#### 12. Node ID 및 Peer 정보 확인 및 공유
+#### 13. Node ID 및 Peer 정보 확인 및 공유
 
 각 노드의 Node ID를 확인하고 IP 주소 및 포트를 함께 제네시스 저장소를 통해 공유합니다.
 
@@ -289,7 +361,7 @@ git pull origin main
 node1_info=$(cat node1-info.txt)
 ```
 
-#### 13. 설정 파일 편집
+#### 14. 설정 파일 편집
 
 각 노드의 설정 파일을 편집합니다 (`~/.mychaind/config/config.toml` 및 `~/.mychaind/config/app.toml`).
 
@@ -330,7 +402,7 @@ persistent_peers = "$node1_info"
 minimum-gas-prices = "1umy"
 ```
 
-#### 14. 노드 실행
+#### 15. 노드 실행
 
 모든 노드에서 다음 명령어를 실행하여 노드를 시작합니다.
 
@@ -338,80 +410,6 @@ minimum-gas-prices = "1umy"
 mychaind start
 ```
 
-#### 15. 테스트 및 모니터링
+#### 16. 테스트 및 모니터링
 
 네트워크가 정상적으로 동작하는지 확인합니다. 블록이 정상적으로 생성되고 있는지, 트랜잭션이 정상적으로 처리되는지 모니터링합니다.
-
-### 전체 과정 요약
-
-0. 소스 코드 받기 (`git clone <source-code-repo-url>`)
-1. 실행 파일 생성 (`ignite chain build`)
-2. 노드 초기화 (`mychaind init <moniker> --chain-id mychain-devnet`)
-3. 키 추가 (`mychaind keys add <validator_name> --keyring-backend file`)
-4. 각 노드의 키 주소 추출 및 공유
-   - Validator Node에서 키 주소를 제네시스 저장소를 통해 Coordinator Node에게 전달
-5. 제네시스 파일 수정 (`mychaind genesis add-genesis-account <validator_address> 20000000umy --keyring-backend file`)
-6. 수정된 제네시스 파일 공유 (제네시스 저장소를 통해 `genesis.json` 공유)
-7. 제네시스 파일 확인 (`cat ~/.mychaind/config/genesis.json`)
-8. `gentx` 생성 (`mychaind genesis gentx <validator_name> 10000000umy --chain-id mychain-devnet --keyring-backend file`)
-9. `gentx` 파일 공유 (Validator Node에서 제네시스 저장소를 통해 `gentx` 파일 공유)
-10. `collect-gentxs` 실행 (`mychaind genesis collect-gentxs --keyring-backend file`)
-11. 제네시스 파일 수정 (denom 변경, `sed -i 's/"stake"/"umy"/g' ~/.mychaind/config/genesis.json`)
-12. Node ID 및 Peer 정보 확인 및 공유 (제네시스 저장소를 통해 Node ID와 Peer 정보 공유)
-13. 설정 파일 편집 (`persistent_peers` 및 `minimum-gas-prices` 설정)
-    - Coordinator Node의 RPC 설정 변경 (`laddr = "tcp://0.0.0.0:26657"`)
-14. 노드 실행 (`mychaind start`)
-15. 테스트 및 모니터링
-
-```mermaid
-sequenceDiagram
-    participant SourceRepo as Source Code Repo
-    participant GenesisRepo as Genesis Data Repo
-    participant CoordNode as Coordinator Node
-    participant ValidNode as Validator Node
-
-    SourceRepo-->>CoordNode: 0. 소스 코드 받기
-    SourceRepo-->>ValidNode: 0. 소스 코드 받기
-
-    CoordNode->>CoordNode: 1. 실행 파일 생성
-    ValidNode->>ValidNode: 1. 실행 파일 생성
-
-    CoordNode->>CoordNode: 2. 노드 초기화 및 계정 생성
-    ValidNode->>ValidNode: 2. 노드 초기화 및 계정 생성
-
-    CoordNode->>CoordNode: 3. 키 주소 추출
-    ValidNode->>ValidNode: 3. 키 주소 추출
-    ValidNode->>GenesisRepo: 3. 키 주소 공유
-    GenesisRepo-->>CoordNode: 3. 키 주소 전달
-
-    CoordNode->>CoordNode: 4. 제네시스 파일 수정
-    CoordNode->>GenesisRepo: 5. 수정된 제네시스 파일 공유
-    GenesisRepo-->>ValidNode: 5. 수정된 제네시스 파일 전달
-
-    ValidNode->>ValidNode: 6. 제네시스 파일 확인
-
-    CoordNode->>CoordNode: 7. gentx 생성
-    ValidNode->>ValidNode: 7. gentx 생성
-    ValidNode->>GenesisRepo: 8. gentx 파일 공유
-    GenesisRepo-->>CoordNode: 8. gentx 파일 전달
-
-    CoordNode->>CoordNode: 9. collect-gentxs 실행
-
-    CoordNode->>CoordNode: 10. 제네시스 파일 수정 (denom 변경)
-    CoordNode->>GenesisRepo: 11. 최신 제네시스 파일 공유
-    GenesisRepo-->>ValidNode: 11. 최신 제네시스 파일 전달
-
-    CoordNode->>CoordNode: 12. Node ID 확인 및 공유
-    ValidNode->>ValidNode: 12. Node ID 확인 및 공유
-    ValidNode->>GenesisRepo: 12. Node ID 및 Peer 정보 공유
-    GenesisRepo-->>CoordNode: 12. Node ID 및 Peer 정보 전달
-
-    CoordNode->>CoordNode: 13. 설정 파일 편집
-    ValidNode->>ValidNode: 13. 설정 파일 편집
-
-    CoordNode->>CoordNode: 14. 노드 실행
-    ValidNode->>ValidNode: 14. 노드 실행
-
-    CoordNode->>CoordNode: 15. 테스트 및 모니터링
-    ValidNode->>ValidNode: 15. 테스트 및 모니터링
-```
